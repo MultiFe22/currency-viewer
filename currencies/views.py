@@ -9,16 +9,6 @@ from .models import Currency
 import datetime
 
 def index(request, rates=None):
-    # # request to https://api.vatcomply.com/rates and get the BRL rate against USD
-    # response = requests.get('https://api.vatcomply.com/rates?base=USD')
-    # # convert the response to json
-    # data = response.json()
-    # # get the BRL rate
-    # brl_rate = data['rates']['BRL']
-
-    # return HttpResponse(f'1 USD = {brl_rate} BRL')
-
-    # get the value of the input field from the form and redirect to the index page loading the value
 
     if request.method == 'POST':
         form = CurrencyForm(request.POST)
@@ -29,9 +19,14 @@ def index(request, rates=None):
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
             date_list = [start_date + datetime.timedelta(days=x) for x in range((end_date-start_date).days + 1)]
+            cleaned_date_list = []
+            for date in date_list:
+                if date.weekday() < 5:
+                    cleaned_date_list.append(date)
+
             print(date_list)
             # for each day in the list, check if the currency is already in the database
-            for date in date_list:
+            for date in cleaned_date_list:
                 if Currency.objects.filter(name=currency, date=date).exists():
                     # if it is, do nothing
                     pass
@@ -44,7 +39,7 @@ def index(request, rates=None):
                     currency_object = Currency(name=currency, date=date, value=currency_rate)
                     currency_object.save()
 
-            currency = Currency.objects.filter(name=currency, date__in=date_list)
+            currency = Currency.objects.filter(name=currency, date__in=cleaned_date_list)
             print(currency)
             return render(request, 'currencies/index.html', { 'rates': currency, 'form': form })
     else:
