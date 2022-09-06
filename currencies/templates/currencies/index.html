@@ -5,13 +5,7 @@
     <title>Exchange Rates</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script type="text/javascript" >
-        function refresh(){
-        var submitButton = 
-        document.getElementById("sub");
-        submitButton.click();
-        }
-    </script>
+    <script src="{% static 'js/refresh.js' %}"></script>
 </head>
 <body>
     <h1>Exchange Rates</h1>
@@ -31,6 +25,7 @@
     <div class="d-flex justify-content-center">
         <form action="{% url 'currencies:index' %}" method="post">
             {% csrf_token %}
+            {{ form.errors }}
             {{ form.as_table }}
             <input type="submit" value="Submit" style="visibility: hidden;" id="sub">
         </form>
