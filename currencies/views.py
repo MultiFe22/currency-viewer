@@ -47,5 +47,3 @@ def index(request, rates=None):
         return render(request, 'currencies/index.html', { 'form': form })
 
     return render(request, 'currencies/index.html', {'rates': rates})
-
-
