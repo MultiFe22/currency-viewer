@@ -24,7 +24,6 @@ def index(request, rates=None):
                 if date.weekday() < 5:
                     cleaned_date_list.append(date)
 
-            print(date_list)
             # for each day in the list, check if the currency is already in the database
             for date in cleaned_date_list:
                 if Currency.objects.filter(name=currency, date=date).exists():
@@ -32,7 +31,6 @@ def index(request, rates=None):
                     pass
                 else:
                     # if it isn't, get the currency value from the API and save it to the database
-                    print (f'Getting {currency} value for {date}')
                     response = requests.get(f'https://api.vatcomply.com/rates?date={date}&base=USD')
                     data = response.json()
                     currency_rate = data['rates'][currency]
@@ -40,7 +38,6 @@ def index(request, rates=None):
                     currency_object.save()
 
             currency = Currency.objects.filter(name=currency, date__in=cleaned_date_list)
-            print(currency)
             return render(request, 'currencies/index.html', { 'rates': currency, 'form': form })
     else:
         form = CurrencyForm()
