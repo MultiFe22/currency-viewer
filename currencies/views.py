@@ -47,3 +47,14 @@ def index(request, rates=None):
         return render(request, 'currencies/index.html', { 'form': form })
 
     return render(request, 'currencies/index.html', {'rates': rates})
+
+def get_currency(request, currency):
+    currency = currency.upper()
+    result = Currency.objects.filter(name=currency)
+    if result.exists():
+        json_result = json.dumps(list(result.values('value', 'date')), indent=4, sort_keys=True, default=str)
+
+        return HttpResponse(json_result , content_type='application/json')
+    
+    else:
+        return HttpResponse(f'No data found for {currency}', status=404)
