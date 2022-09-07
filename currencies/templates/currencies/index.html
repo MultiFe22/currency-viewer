@@ -6,9 +6,13 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/refresh.js' %}"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
 </head>
 <body>
     <h1>Exchange Rates</h1>
+    <div class="border" id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     {% for rate in rates %}
     
     <table>
@@ -30,5 +34,56 @@
             <input type="submit" value="Submit" style="visibility: hidden;" id="sub">
         </form>
     </div>
+
+
+    <script>
+        var _categories = [
+            {% for rate in rates %}
+                '{{ rate.date }}',
+            {% endfor %}
+        ];
+
+        var _rates = [
+            {% for rate in rates %}
+                {{ rate.value }},
+            {% endfor %}
+        ];
+        Highcharts.chart('container', {
+        chart: {
+                type: 'line'
+        },
+        title: {
+                text: 'Rates'
+        },
+        xAxis: {
+                categories: _categories,
+                crosshair: true
+        },
+        yAxis: {
+                min: Math.min(..._rates)*0.9,
+                title: {
+            text: 'Rate'
+                }
+        },
+        tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.2f} USD</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+        },
+        plotOptions: {
+                column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+          }
+        },
+        series: [{
+                name: 'Price',
+                data: _rates
+        }]
+        });
+        </script>
 
 </html>
